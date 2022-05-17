@@ -1,66 +1,55 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:stream_provider/custom_alert_dialog.dart';
 import 'package:web_socket_channel/io.dart';
 
-// final messageProvider = StreamProvider.autoDispose((ref) async* {
-//   final channel = IOWebSocketChannel.connect("ws://localhost:8081");
-//   ref.onDispose(() => channel.sink.close());
-//
-//   await for (final value in channel.stream) {
-//     yield value.toString();
-//   }
-// });
+StreamController<String> stringStream = StreamController<String>();
+
+final monologueProvider = StreamProvider.autoDispose<String>((ref) {
+  final streamController = StreamController<String>();
+  ref.onDispose(() => streamController.sink.close());
+
+  return stringStream.stream;
+});
 
 var monologueList = [];
 
 class MonologuePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
-    // AsyncValue<String> message = ref.watch(messageProvider);
+
+
+    final monologue = ref.watch(monologueProvider);
+    monologueList.add(monologue.toString());
     final monologueController = TextEditingController();
-    final List<String> wordList = [
-      "a",
-      "b",
-      "c",
-      "d",
-      "e",
-      "f",
-      "g",
-      "h",
-      "i",
-      "j",
-      "a",
-      "b",
-      "c",
-      "d",
-      "e",
-      "f",
-      "g",
-      "h",
-      "i",
-      "j",
-    ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("ひとり言アプリ"),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: wordList.length,
-        itemBuilder: (context, int index) {
-          return Card(
-            elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.chat),
-              title: Text(wordList[index]),
-            ),
+      body: monologue.when(
+        data: (monologue) {
+          return ListView.builder(
+            itemCount: monologueList.length,
+            itemBuilder: (context, int index) {
+              return Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.chat),
+                  title: Text(monologueList[index].toString()),
+                ),
+              );
+            },
           );
         },
+        error: (err, stack) => Text("Error: $err"),
+        loading: () => const CircularProgressIndicator(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addMonologue(context, monologueController),
@@ -72,7 +61,6 @@ class MonologuePage extends ConsumerWidget {
   _addMonologue(BuildContext context, TextEditingController controller) {
     showDialog(
         context: context,
-
         builder: (context) => CustomAlertDialog(
               title: "新たなひとり言",
               contentWidget: Column(
@@ -95,10 +83,8 @@ class MonologuePage extends ConsumerWidget {
   }
 
   _submitAction(BuildContext context, TextEditingController controller) {
-    monologueList.add(controller.text);
-    monologueList.forEach((element) {
-      print(element);
-    });
+    //Streamとやり方変わらなくないか？ StreamProviderの使用例全くない。。。
+    stringStream.sink.add(controller.text);
   }
 
   _cancelAction(BuildContext context) {
