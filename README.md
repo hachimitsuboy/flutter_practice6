@@ -2,15 +2,8 @@
 
 A new Flutter project.
 
-## Getting Started
+## 疑問点
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1.入力された文字をリストに表示されるアプリを作成したが、毎回最初の2つにAsyncLoadingが入ってくる
+2.今のところStreamProviderを使う理由がわからない（これくらい簡単なアプリだと有り難みがわからないのか？）
+3.正直なところ、リファレンスを見よう見真似でやり、例も全くないためほとんど分からなかった
